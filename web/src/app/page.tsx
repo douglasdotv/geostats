@@ -3,6 +3,7 @@ import {
   formatDistance,
   formatRelativeTime,
   formatMovementRestrictions,
+  getTimeToGuess,
 } from '@/lib/utils';
 import { RECENT_GUESSES_LIMIT } from '@/lib/constants';
 import { Guess } from '@/types/guess';
@@ -34,6 +35,7 @@ export default async function Home() {
             <th className='py-2 pr-4 text-left'>Actual Location</th>
             <th className='py-2 pr-4 text-left'>Distance</th>
             <th className='py-2 pr-4 text-left'>When</th>
+            <th className='py-2 pr-4 text-left'>Time to Guess</th>
             <th className='py-2 pr-4 text-left'>View</th>
           </tr>
         </thead>
@@ -51,6 +53,9 @@ export default async function Home() {
               <td className='py-2 pr-4'>{g.actual_display_name}</td>
               <td className='py-2 pr-4'>{formatDistance(g.distance)}</td>
               <td className='py-2 pr-4'>{formatRelativeTime(g.guess_time)}</td>
+              <td className='py-2 pr-4'>
+                {getTimeToGuess(g.guess_time, g.round_start_time)}
+              </td>
               <td className='py-2 pr-4'>
                 {g.actual_lat && g.actual_lng ? (
                   <a

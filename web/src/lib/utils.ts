@@ -1,3 +1,13 @@
+export function getTimeToGuess(
+  guessTime: string,
+  roundStartTime: string,
+): string {
+  const guessMs = new Date(guessTime).getTime();
+  const roundMs = new Date(roundStartTime).getTime();
+  const diffInSeconds = (guessMs - roundMs) / 1000;
+  return `${diffInSeconds.toFixed(0)}s`;
+}
+
 export function formatMovementRestrictions(
   restrictions: Record<string, unknown> | null,
 ): string {
