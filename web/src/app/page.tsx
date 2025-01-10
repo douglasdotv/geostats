@@ -34,6 +34,7 @@ export default async function Home() {
             <th className='py-2 pr-4 text-left'>Actual Location</th>
             <th className='py-2 pr-4 text-left'>Distance</th>
             <th className='py-2 pr-4 text-left'>When</th>
+            <th className='py-2 pr-4 text-left'>View</th>
           </tr>
         </thead>
         <tbody>
@@ -50,6 +51,20 @@ export default async function Home() {
               <td className='py-2 pr-4'>{g.actual_display_name}</td>
               <td className='py-2 pr-4'>{formatDistance(g.distance)}</td>
               <td className='py-2 pr-4'>{formatRelativeTime(g.guess_time)}</td>
+              <td className='py-2 pr-4'>
+                {g.actual_lat && g.actual_lng ? (
+                  <a
+                    href={`https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${g.actual_lat},${g.actual_lng}`}
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    className='underline text-blue-600'
+                  >
+                    🌐
+                  </a>
+                ) : (
+                  'N/A'
+                )}
+              </td>
             </tr>
           ))}
         </tbody>
