@@ -30,3 +30,8 @@ export interface Guess {
   pano_id: string | null;
   created_at: string | null;
 }
+
+export interface GroupedGuess {
+  bestGuess: Guess;
+  otherGuesses: Guess[];
+}
