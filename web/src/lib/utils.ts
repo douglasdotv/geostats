@@ -1,3 +1,21 @@
+export function formatMovementRestrictions(
+  restrictions: Record<string, unknown> | null,
+): string {
+  if (!restrictions) return 'Unknown';
+
+  const { forbidMoving, forbidZooming, forbidRotating } = restrictions;
+
+  if (forbidMoving && forbidZooming && forbidRotating) {
+    return 'NMPZ';
+  }
+
+  if (forbidMoving) {
+    return 'No Move';
+  }
+
+  return 'Moving';
+}
+
 export function formatDistance(d: number | null) {
   if (d === null) return 'Unknown';
   if (d < 1000) return `${d.toFixed(0)} m`;

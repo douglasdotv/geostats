@@ -1,5 +1,9 @@
 import { supabase } from '@/lib/supabaseClient';
-import { formatDistance, formatRelativeTime } from '@/lib/utils';
+import {
+  formatDistance,
+  formatRelativeTime,
+  formatMovementRestrictions,
+} from '@/lib/utils';
 import { RECENT_GUESSES_LIMIT } from '@/lib/constants';
 import { Guess } from '@/types/guess';
 
@@ -38,7 +42,10 @@ export default async function Home() {
               key={g.id}
               className='border-b hover:bg-gray-50 dark:hover:bg-gray-900'
             >
-              <td className='py-2 pr-4'>{g.game_type}</td>
+              <td className='py-2 pr-4'>
+                {g.game_type}/
+                {formatMovementRestrictions(g.movement_restrictions)}
+              </td>
               <td className='py-2 pr-4'>{g.guess_display_name ?? 'Unknown'}</td>
               <td className='py-2 pr-4'>{g.actual_display_name}</td>
               <td className='py-2 pr-4'>{formatDistance(g.distance)}</td>
