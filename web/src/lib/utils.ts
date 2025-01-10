@@ -1,3 +1,13 @@
+import { GuessQuality } from '@/types/guess';
+
+export function getGuessQuality(distance: number | null): GuessQuality {
+  const distanceKm = distance === null ? null : distance / 1000;
+  if (distanceKm === null) return GuessQuality.Bad;
+  if (distanceKm < 50) return GuessQuality.Good;
+  if (distanceKm < 1000) return GuessQuality.Average;
+  return GuessQuality.Bad;
+}
+
 export function getTimeToGuess(
   guessTime: string,
   roundStartTime: string,

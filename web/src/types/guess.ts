@@ -35,3 +35,9 @@ export interface GroupedGuess {
   bestGuess: Guess;
   otherGuesses: Guess[];
 }
+
+export enum GuessQuality {
+  Good = 'good',
+  Average = 'average',
+  Bad = 'bad',
+}

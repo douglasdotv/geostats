@@ -1,6 +1,6 @@
 import { Guess } from '@/types/guess';
+import { DistanceCell } from '@/components/guesses/DistanceCell';
 import {
-  formatDistance,
   formatRelativeTime,
   formatMovementRestrictions,
   getTimeToGuess,
@@ -81,7 +81,9 @@ export function GuessRow({
       <td className='py-2 pr-4'>
         {renderLocation(guess.actual_display_name, guess.actual_country)}
       </td>
-      <td className='py-2 pr-4'>{formatDistance(guess.distance)}</td>
+      <td className='py-2 pr-4'>
+        <DistanceCell distance={guess.distance} />
+      </td>
       <td className='py-2 pr-4'>{formatRelativeTime(guess.guess_time)}</td>
       <td className='py-2 pr-4'>
         {getTimeToGuess(guess.guess_time, guess.round_start_time)}
