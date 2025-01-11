@@ -1,51 +1,50 @@
 'use client';
 
 import { useState, Fragment } from 'react';
-import { Guess, GroupedGuess } from '@/types/guess';
+import { Guess, GuessWithAdditionalGuesses } from '@/types/guess';
 import { GuessRow } from '@/components/guesses/GuessRow';
+import { getAdditionalGuesses } from '@/app/actions';
 
 interface GuessesTableProps {
-  readonly guesses: Guess[];
-}
-
-function groupBrGuesses(guesses: Guess[]): GroupedGuess[] {
-  const brGroups = new Map<string, Guess[]>();
-  const result: GroupedGuess[] = [];
-  const nonBr: Guess[] = [];
-
-  guesses.forEach((g) => {
-    if (g.game_type === 'br') {
-      const key = `${g.game_id}-${g.round_number}`;
-      if (!brGroups.has(key)) brGroups.set(key, []);
-      brGroups.get(key)?.push(g);
-    } else {
-      nonBr.push(g);
-    }
-  });
-
-  brGroups.forEach((group) => {
-    if (group.length === 1) {
-      result.push({ bestGuess: group[0], otherGuesses: [] });
-    } else {
-      const sorted = [...group].sort((a, b) => {
-        const distA = a.distance ?? Infinity;
-        const distB = b.distance ?? Infinity;
-        return distA - distB;
-      });
-      result.push({ bestGuess: sorted[0], otherGuesses: sorted.slice(1) });
-    }
-  });
-
-  const singleRows = nonBr.map((g) => ({ bestGuess: g, otherGuesses: [] }));
-  return [...singleRows, ...result];
+  readonly guesses: GuessWithAdditionalGuesses[];
 }
 
 export function GuessesTable({ guesses }: GuessesTableProps) {
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
-  const grouped = groupBrGuesses(guesses);
+  const [additionalGuesses, setAdditionalGuesses] = useState<
+    Record<string, Guess[]>
+  >({});
+  const [loadingRows, setLoadingRows] = useState<Set<string>>(new Set());
 
-  const toggleExpand = (id: string) => {
+  const toggleExpand = async (
+    id: string,
+    gameId: string,
+    roundNumber: number,
+  ) => {
     const copy = new Set(expandedRows);
+    const isExpanding = !copy.has(id);
+
+    if (isExpanding && !additionalGuesses[id]) {
+      setLoadingRows((prev) => new Set(prev).add(id));
+
+      try {
+        const data = await getAdditionalGuesses(gameId, roundNumber);
+        if (data) {
+          setAdditionalGuesses((prev) => ({
+            ...prev,
+            [id]: data,
+          }));
+        }
+      } catch (error) {
+        console.error('Failed to fetch additional guesses:', error);
+      }
+
+      setLoadingRows((prev) => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
+    }
 
     if (copy.has(id)) {
       copy.delete(id);
@@ -70,18 +69,22 @@ export function GuessesTable({ guesses }: GuessesTableProps) {
         </tr>
       </thead>
       <tbody>
-        {grouped.map(({ bestGuess, otherGuesses }) => {
-          const rowKey = `${bestGuess.game_id}-${bestGuess.round_number}`;
-          const hasOthers = otherGuesses.length > 0;
+        {guesses?.map((guess) => {
+          const rowKey = `${guess.game_id}-${guess.round_number}`;
           const isExpanded = expandedRows.has(rowKey);
+          const isLoading = loadingRows.has(rowKey);
+          const otherGuesses = additionalGuesses[rowKey] || [];
+
           return (
             <Fragment key={rowKey}>
               <GuessRow
-                key={bestGuess.id}
-                guess={bestGuess}
-                isExpandable={hasOthers}
+                guess={guess}
+                isExpandable={guess.has_additional_guesses}
                 isExpanded={isExpanded}
-                onToggle={() => toggleExpand(rowKey)}
+                onToggle={() =>
+                  toggleExpand(rowKey, guess.game_id, guess.round_number)
+                }
+                isLoading={isLoading}
               />
               {isExpanded &&
                 otherGuesses.map((g) => (

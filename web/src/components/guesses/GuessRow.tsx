@@ -14,6 +14,7 @@ interface GuessRowProps {
   readonly isExpanded?: boolean;
   readonly onToggle?: () => void;
   readonly isSubRow?: boolean;
+  readonly isLoading?: boolean;
 }
 
 export function GuessRow({
@@ -22,6 +23,7 @@ export function GuessRow({
   isExpanded = false,
   onToggle,
   isSubRow = false,
+  isLoading = false,
 }: GuessRowProps) {
   const subRowClass = isSubRow ? 'bg-gray-100 dark:bg-gray-800' : '';
 
@@ -59,6 +61,11 @@ export function GuessRow({
     </div>
   );
 
+  const getButtonText = () => {
+    if (isLoading) return '...';
+    return isExpanded ? '-' : '+';
+  };
+
   return (
     <tr
       className={`border-b hover:bg-gray-50 dark:hover:bg-gray-900 ${subRowClass}`}
@@ -68,8 +75,9 @@ export function GuessRow({
           <button
             onClick={onToggle}
             className='mr-2 px-1 text-xs border rounded'
+            disabled={isLoading}
           >
-            {isExpanded ? '-' : '+'}
+            {getButtonText()}
           </button>
         )}
         {guess.game_type}/

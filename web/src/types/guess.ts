@@ -31,6 +31,10 @@ export interface Guess {
   created_at: string | null;
 }
 
+export interface GuessWithAdditionalGuesses extends Guess {
+  has_additional_guesses: boolean;
+}
+
 export interface GroupedGuess {
   bestGuess: Guess;
   otherGuesses: Guess[];
