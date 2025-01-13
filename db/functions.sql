@@ -152,3 +152,32 @@ RETURNS SETOF guesses AS $$
   AND g.distance > bg.min_distance
   ORDER BY g.distance;
 $$ LANGUAGE SQL;
+
+-- Get country stats
+CREATE OR REPLACE FUNCTION get_country_stats()
+RETURNS TABLE (
+  country TEXT,
+  total_guesses BIGINT,
+  correct_guesses BIGINT,
+  correct_percentage DECIMAL,
+  average_distance DECIMAL
+) AS $$
+  WITH country_metrics AS (
+    SELECT 
+      actual_country,
+      COUNT(*) as total,
+      COUNT(CASE WHEN actual_country = guess_country THEN 1 END) as correct,
+      AVG(distance) as avg_distance
+    FROM guesses
+    WHERE actual_country IS NOT NULL
+    GROUP BY actual_country
+  )
+  SELECT
+    actual_country as country,
+    total as total_guesses,
+    correct as correct_guesses,
+    ROUND((correct::DECIMAL / total::DECIMAL) * 100, 2) as correct_percentage,
+    ROUND(avg_distance::DECIMAL, 2) as average_distance
+  FROM country_metrics
+  ORDER BY correct_percentage DESC;
+$$ LANGUAGE SQL;
