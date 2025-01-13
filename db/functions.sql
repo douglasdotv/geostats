@@ -53,10 +53,14 @@ CREATE TYPE guess_with_has_additional_guesses_flag AS (
   has_additional_guesses BOOLEAN
 );
 
--- Get best guesses for pagination with has_additional_guesses flag
-CREATE OR REPLACE FUNCTION get_best_guesses_paginated(page_start INTEGER, page_end INTEGER)
+-- Get guesses for pagination with has_additional_guesses flag
+CREATE OR REPLACE FUNCTION get_sorted_guesses_paginated(
+  page_start INTEGER,
+  page_end INTEGER,
+  sort_order TEXT DEFAULT 'latest'
+)
 RETURNS SETOF guess_with_has_additional_guesses_flag AS $$
-  WITH best_guesses AS (
+  WITH ranked_guesses AS (
     SELECT DISTINCT ON (g.game_id, g.round_number) 
       g.id,
       g.game_id,
@@ -76,10 +80,10 @@ RETURNS SETOF guess_with_has_additional_guesses_flag AS $$
       g.actual_city,
       g.actual_state,
       g.actual_country,
-      g.heading::DOUBLE PRECISION,
-      g.pitch::DOUBLE PRECISION,
-      g.zoom::DOUBLE PRECISION,
-      g.distance::DOUBLE PRECISION,
+      g.heading,
+      g.pitch,
+      g.zoom,
+      g.distance,
       g.score,
       g.round_number,
       g.round_start_time,
@@ -104,8 +108,17 @@ RETURNS SETOF guess_with_has_additional_guesses_flag AS $$
     ))
     ORDER BY g.game_id, g.round_number, g.created_at DESC
   )
-  SELECT * FROM best_guesses
-  ORDER BY created_at DESC
+  SELECT * FROM ranked_guesses
+  ORDER BY 
+    CASE sort_order
+      WHEN 'best' THEN distance
+      WHEN 'worst' THEN -distance
+      ELSE NULL
+    END NULLS LAST,
+    CASE 
+      WHEN sort_order = 'latest' THEN created_at
+      ELSE NULL
+    END DESC NULLS LAST
   OFFSET page_start
   LIMIT (page_end - page_start + 1);
 $$ LANGUAGE SQL;
