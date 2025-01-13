@@ -1,6 +1,8 @@
 'use server';
 
 import { supabase } from '@/lib/supabaseClient';
+import { CountryStats } from '@/types/stats';
+import { isRawCountryStats } from '@/lib/validation';
 
 export async function getAdditionalGuesses(
   gameId: string,
@@ -13,4 +15,21 @@ export async function getAdditionalGuesses(
 
   if (error) throw error;
   return data;
+}
+
+export async function getCountryStats(): Promise<CountryStats[]> {
+  const { data, error } = await supabase.rpc('get_country_stats');
+
+  if (error) throw error;
+  if (!data || !isRawCountryStats(data)) {
+    throw new Error('Invalid data format from country stats RPC');
+  }
+
+  return data.map((stat) => ({
+    country: stat.country,
+    totalGuesses: Number(stat.total_guesses),
+    correctGuesses: Number(stat.correct_guesses),
+    correctPercentage: Number(stat.correct_percentage),
+    averageDistance: Number(stat.average_distance),
+  }));
 }
