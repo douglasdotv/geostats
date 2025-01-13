@@ -3,6 +3,8 @@ import { GuessesTable } from '@/components/guesses/GuessesTable';
 import { PaginationControls } from '@/components/pagination/PaginationControls';
 import { SortControls } from '@/components/sort/SortControls';
 import { CountryFilter } from '@/components/filter/CountryFilter';
+import { CountryStatsButton } from '@/components/stats/CountryStatsButton';
+import { getCountryStats } from '@/app/actions';
 import { ITEMS_PER_PAGE } from '@/lib/constants';
 
 type SearchParamsContent = {
@@ -41,6 +43,7 @@ export default async function Home({ searchParams }: PageProps) {
   );
 
   const { data: countries } = await supabase.rpc('get_unique_countries');
+  const countryStats = await getCountryStats();
 
   if (error) {
     return (
@@ -54,8 +57,9 @@ export default async function Home({ searchParams }: PageProps) {
 
   return (
     <main className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
-      <div className='flex justify-between items-center mb-6'>
+      <div className='flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6'>
         <SortControls currentOption={sort} />
+        <CountryStatsButton stats={countryStats} />
         <CountryFilter countries={countries} currentCountry={country} />
       </div>
       <GuessesTable guesses={guesses} />
