@@ -1,22 +1,36 @@
+'use client';
+
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 
 interface SortControlsProps {
   readonly currentOption: string;
 }
 
 export function SortControls({ currentOption }: SortControlsProps) {
-  const options = [
+  const searchParams = useSearchParams();
+  const currentCountry = searchParams.get('country');
+
+  const sorts = [
     { label: 'Latest', value: 'latest' },
     { label: 'Best', value: 'best' },
     { label: 'Worst', value: 'worst' },
   ];
 
+  const getQueryParams = (sort: string) => {
+    const params: Record<string, string> = { sort, page: '1' };
+    if (currentCountry) {
+      params.country = currentCountry;
+    }
+    return params;
+  };
+
   return (
-    <div className='mb-6 flex gap-2'>
-      {options.map(({ label, value }) => (
+    <div className='flex gap-2'>
+      {sorts.map(({ label, value }) => (
         <Link
           key={value}
-          href={{ query: { sort: value, page: 1 } }}
+          href={{ query: getQueryParams(value) }}
           className={`px-4 py-2 rounded-md border ${
             currentOption === value
               ? 'bg-blue-600 text-white border-blue-600'

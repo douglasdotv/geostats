@@ -4,13 +4,28 @@ interface PaginationControlsProps {
   readonly currentPage: number;
   readonly totalPages: number;
   readonly currentSort: string;
+  readonly currentCountry: string | null;
 }
 
 export function PaginationControls({
   currentPage,
   totalPages,
   currentSort,
+  currentCountry,
 }: PaginationControlsProps) {
+  const getQueryParams = (page: number) => {
+    const params: Record<string, string> = {
+      page: page.toString(),
+      sort: currentSort,
+    };
+
+    if (currentCountry) {
+      params.country = currentCountry;
+    }
+
+    return params;
+  };
+
   const renderPageButtons = () => {
     const buttons = [];
     const showEllipsis = totalPages > 7;
@@ -25,7 +40,7 @@ export function PaginationControls({
         buttons.push(
           <Link
             key={i}
-            href={{ query: { page: i, sort: currentSort } }}
+            href={{ query: getQueryParams(i) }}
             className={`px-3 py-1 mx-1 rounded-md ${
               currentPage === i
                 ? 'bg-blue-600 text-white'
@@ -54,7 +69,7 @@ export function PaginationControls({
   return (
     <div className='flex justify-center items-center space-x-2 my-6'>
       <Link
-        href={{ query: { page: currentPage - 1, sort: currentSort } }}
+        href={{ query: getQueryParams(currentPage - 1) }}
         className={`px-3 py-1 rounded-md bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 ${
           currentPage === 1 ? 'pointer-events-none opacity-50' : ''
         }`}
@@ -64,7 +79,7 @@ export function PaginationControls({
       </Link>
       {renderPageButtons()}
       <Link
-        href={{ query: { page: currentPage + 1, sort: currentSort } }}
+        href={{ query: getQueryParams(currentPage + 1) }}
         className={`px-3 py-1 rounded-md bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 ${
           currentPage === totalPages ? 'pointer-events-none opacity-50' : ''
         }`}
