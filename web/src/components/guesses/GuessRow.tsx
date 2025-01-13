@@ -15,6 +15,7 @@ interface GuessRowProps {
   readonly onToggle?: () => void;
   readonly isSubRow?: boolean;
   readonly isLoading?: boolean;
+  readonly onShowMap: () => void;
 }
 
 export function GuessRow({
@@ -24,6 +25,7 @@ export function GuessRow({
   onToggle,
   isSubRow = false,
   isLoading = false,
+  onShowMap,
 }: GuessRowProps) {
   const subRowClass = isSubRow ? 'bg-gray-100 dark:bg-gray-800' : '';
 
@@ -66,6 +68,10 @@ export function GuessRow({
     return isExpanded ? '-' : '+';
   };
 
+  const hasActualLocation = Boolean(guess.actual_lat && guess.actual_lng);
+  const hasGuessLocation = Boolean(guess.guess_lat && guess.guess_lng);
+  const canShowMap = hasActualLocation && hasGuessLocation;
+
   return (
     <tr
       className={`border-b hover:bg-gray-50 dark:hover:bg-gray-900 ${subRowClass}`}
@@ -97,18 +103,27 @@ export function GuessRow({
         {getTimeToGuess(guess.guess_time, guess.round_start_time)}
       </td>
       <td className='py-2 pr-4'>
-        {guess.actual_lat && guess.actual_lng ? (
-          <a
-            href={`https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${guess.actual_lat},${guess.actual_lng}`}
-            target='_blank'
-            rel='noopener noreferrer'
-            className='underline text-blue-600'
-          >
-            🌐
-          </a>
-        ) : (
-          'N/A'
-        )}
+        <div className='flex gap-2'>
+          {hasActualLocation && (
+            <a
+              href={`https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${guess.actual_lat},${guess.actual_lng}`}
+              target='_blank'
+              rel='noopener noreferrer'
+              className='text-blue-600 hover:text-blue-800'
+            >
+              🌐
+            </a>
+          )}
+          {canShowMap && (
+            <button
+              onClick={onShowMap}
+              className='text-blue-600 hover:text-blue-800 cursor-pointer transition-colors'
+              aria-label='Show map'
+            >
+              🗺️
+            </button>
+          )}
+        </div>
       </td>
     </tr>
   );
