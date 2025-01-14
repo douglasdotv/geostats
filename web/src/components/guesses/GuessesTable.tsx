@@ -1,5 +1,7 @@
 'use client';
 
+import 'react-tooltip/dist/react-tooltip.css';
+import { Tooltip } from 'react-tooltip';
 import { useState, Fragment } from 'react';
 import { Guess, GuessWithAdditionalGuesses } from '@/types/guess';
 import { GuessRow } from '@/components/guesses/GuessRow';
@@ -18,29 +20,20 @@ export function GuessesTable({ guesses }: GuessesTableProps) {
   const [loadingRows, setLoadingRows] = useState<Set<string>>(new Set());
   const [activeMapGuess, setActiveMapGuess] = useState<Guess | null>(null);
 
-  const toggleExpand = async (
-    id: string,
-    gameId: string,
-    roundNumber: number,
-  ) => {
+  async function toggleExpand(id: string, gameId: string, roundNumber: number) {
     const copy = new Set(expandedRows);
     const isExpanding = !copy.has(id);
 
     if (isExpanding && !additionalGuesses[id]) {
       setLoadingRows((prev) => new Set(prev).add(id));
-
       try {
         const data = await getAdditionalGuesses(gameId, roundNumber);
         if (data) {
-          setAdditionalGuesses((prev) => ({
-            ...prev,
-            [id]: data,
-          }));
+          setAdditionalGuesses((prev) => ({ ...prev, [id]: data }));
         }
       } catch (error) {
         console.error('Failed to fetch additional guesses:', error);
       }
-
       setLoadingRows((prev) => {
         const next = new Set(prev);
         next.delete(id);
@@ -53,9 +46,8 @@ export function GuessesTable({ guesses }: GuessesTableProps) {
     } else {
       copy.add(id);
     }
-
     setExpandedRows(copy);
-  };
+  }
 
   return (
     <>
@@ -72,7 +64,7 @@ export function GuessesTable({ guesses }: GuessesTableProps) {
           </tr>
         </thead>
         <tbody>
-          {guesses?.map((guess) => {
+          {guesses.map((guess) => {
             const rowKey = `${guess.game_id}-${guess.round_number}`;
             const isExpanded = expandedRows.has(rowKey);
             const isLoading = loadingRows.has(rowKey);
@@ -106,6 +98,8 @@ export function GuessesTable({ guesses }: GuessesTableProps) {
           })}
         </tbody>
       </table>
+
+      <Tooltip id='guess-row-tooltip' place='top' variant='dark' />
 
       {activeMapGuess &&
         Boolean(activeMapGuess.actual_lat) &&

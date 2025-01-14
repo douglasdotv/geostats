@@ -15,7 +15,7 @@ interface GuessRowProps {
   readonly onToggle?: () => void;
   readonly isSubRow?: boolean;
   readonly isLoading?: boolean;
-  readonly onShowMap: () => void;
+  readonly onShowMap?: () => void;
 }
 
 export function GuessRow({
@@ -29,7 +29,7 @@ export function GuessRow({
 }: GuessRowProps) {
   const subRowClass = isSubRow ? 'bg-gray-100 dark:bg-gray-800' : '';
 
-  const getCountryCode = (countryName: string | null) => {
+  function getCountryCode(countryName: string | null) {
     if (!countryName) return null;
     try {
       const country = lookup.byCountry(countryName);
@@ -37,12 +37,11 @@ export function GuessRow({
     } catch {
       return null;
     }
-  };
+  }
 
-  const renderFlag = (countryName: string | null) => {
+  function renderFlag(countryName: string | null) {
     const code = getCountryCode(countryName);
     if (!code) return null;
-
     return (
       <ReactCountryFlag
         countryCode={code}
@@ -51,26 +50,37 @@ export function GuessRow({
         aria-label={countryName ?? 'Unknown country'}
       />
     );
-  };
+  }
 
-  const renderLocation = (
+  function renderLocation(
     displayName: string | null,
     countryName: string | null,
-  ) => (
-    <div className='flex items-center'>
-      {renderFlag(countryName)}
-      <span>{displayName ?? 'Unknown'}</span>
-    </div>
-  );
+  ) {
+    return (
+      <div className='flex items-center'>
+        {renderFlag(countryName)}
+        <span>{displayName ?? 'Unknown'}</span>
+      </div>
+    );
+  }
 
-  const getButtonText = () => {
+  function getButtonText() {
     if (isLoading) return '...';
     return isExpanded ? '-' : '+';
-  };
+  }
 
   const hasActualLocation = Boolean(guess.actual_lat && guess.actual_lng);
   const hasGuessLocation = Boolean(guess.guess_lat && guess.guess_lng);
   const canShowMap = hasActualLocation && hasGuessLocation;
+
+  let brTooltipContent: string;
+  if (isLoading) {
+    brTooltipContent = 'Loading...';
+  } else if (isExpanded) {
+    brTooltipContent = 'Hide additional guesses';
+  } else {
+    brTooltipContent = 'Show additional guesses for this round';
+  }
 
   return (
     <tr
@@ -82,6 +92,8 @@ export function GuessRow({
             onClick={onToggle}
             className='mr-2 px-1 text-xs border rounded'
             disabled={isLoading}
+            data-tooltip-id='guess-row-tooltip'
+            data-tooltip-content={brTooltipContent}
           >
             {getButtonText()}
           </button>
@@ -110,6 +122,8 @@ export function GuessRow({
               target='_blank'
               rel='noopener noreferrer'
               className='text-blue-600 hover:text-blue-800'
+              data-tooltip-id='guess-row-tooltip'
+              data-tooltip-content='Show in Street View'
             >
               🌐
             </a>
@@ -118,7 +132,8 @@ export function GuessRow({
             <button
               onClick={onShowMap}
               className='text-blue-600 hover:text-blue-800 cursor-pointer transition-colors'
-              aria-label='Show map'
+              data-tooltip-id='guess-row-tooltip'
+              data-tooltip-content='Show in map'
             >
               🗺️
             </button>
