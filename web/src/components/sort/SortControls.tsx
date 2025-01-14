@@ -1,13 +1,16 @@
 'use client';
 
-import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useTransition } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { Spinner } from '@/components/shared/Spinner';
 
 interface SortControlsProps {
   readonly currentOption: string;
 }
 
 export function SortControls({ currentOption }: SortControlsProps) {
+  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
   const searchParams = useSearchParams();
   const currentCountry = searchParams.get('country');
 
@@ -17,29 +20,34 @@ export function SortControls({ currentOption }: SortControlsProps) {
     { label: 'Worst', value: 'worst' },
   ];
 
-  const getQueryParams = (sort: string) => {
-    const params: Record<string, string> = { sort, page: '1' };
+  const handleSort = (value: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('sort', value);
+    params.set('page', '1');
     if (currentCountry) {
-      params.country = currentCountry;
+      params.set('country', currentCountry);
     }
-    return params;
+    startTransition(() => {
+      router.push(`?${params.toString()}`);
+    });
   };
 
   return (
-    <div className='flex gap-2'>
+    <div className='flex items-center gap-2'>
       {sorts.map(({ label, value }) => (
-        <Link
+        <button
           key={value}
-          href={{ query: getQueryParams(value) }}
-          className={`px-4 py-2 rounded-md border ${
+          onClick={() => handleSort(value)}
+          className={`px-4 py-2 rounded-md border transition-colors ${
             currentOption === value
               ? 'bg-blue-600 text-white border-blue-600'
               : 'border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800'
-          } transition-colors`}
+          }`}
         >
           {label}
-        </Link>
+        </button>
       ))}
+      {isPending && <Spinner />}
     </div>
   );
 }
