@@ -7,6 +7,8 @@ import { CountryStatsButton } from '@/components/stats/CountryStatsButton';
 import { getCountryStats } from '@/app/actions';
 import { ITEMS_PER_PAGE } from '@/lib/constants';
 
+export const dynamic = 'force-dynamic';
+
 type SearchParamsContent = {
   page?: string;
   sort?: 'latest' | 'best' | 'worst';
