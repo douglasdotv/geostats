@@ -1,4 +1,8 @@
-import Link from 'next/link';
+'use client';
+
+import { useTransition } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Spinner } from '@/components/shared/Spinner';
 
 interface PaginationControlsProps {
   readonly currentPage: number;
@@ -13,17 +17,24 @@ export function PaginationControls({
   currentSort,
   currentCountry,
 }: PaginationControlsProps) {
+  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
   const getQueryParams = (page: number) => {
-    const params: Record<string, string> = {
-      page: page.toString(),
-      sort: currentSort,
-    };
-
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('page', page.toString());
+    params.set('sort', currentSort);
     if (currentCountry) {
-      params.country = currentCountry;
+      params.set('country', currentCountry);
     }
-
     return params;
+  };
+
+  const goToPage = (page: number) => {
+    startTransition(() => {
+      router.push(`?${getQueryParams(page).toString()}`);
+    });
   };
 
   const renderPageButtons = () => {
@@ -38,9 +49,9 @@ export function PaginationControls({
         (i >= currentPage - pageWindow && i <= currentPage + pageWindow)
       ) {
         buttons.push(
-          <Link
+          <button
             key={i}
-            href={{ query: getQueryParams(i) }}
+            onClick={() => goToPage(i)}
             className={`px-3 py-1 mx-1 rounded-md ${
               currentPage === i
                 ? 'bg-blue-600 text-white'
@@ -49,7 +60,7 @@ export function PaginationControls({
             aria-current={currentPage === i ? 'page' : undefined}
           >
             {i}
-          </Link>,
+          </button>,
         );
       } else if (
         showEllipsis &&
@@ -68,25 +79,28 @@ export function PaginationControls({
 
   return (
     <div className='flex justify-center items-center space-x-2 my-6'>
-      <Link
-        href={{ query: getQueryParams(currentPage - 1) }}
+      <button
+        onClick={() => goToPage(currentPage - 1)}
+        disabled={currentPage === 1}
         className={`px-3 py-1 rounded-md bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 ${
-          currentPage === 1 ? 'pointer-events-none opacity-50' : ''
+          currentPage === 1 ? 'opacity-50' : ''
         }`}
         aria-disabled={currentPage === 1}
       >
         Previous
-      </Link>
+      </button>
       {renderPageButtons()}
-      <Link
-        href={{ query: getQueryParams(currentPage + 1) }}
+      <button
+        onClick={() => goToPage(currentPage + 1)}
+        disabled={currentPage === totalPages}
         className={`px-3 py-1 rounded-md bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 ${
-          currentPage === totalPages ? 'pointer-events-none opacity-50' : ''
+          currentPage === totalPages ? 'opacity-50' : ''
         }`}
         aria-disabled={currentPage === totalPages}
       >
         Next
-      </Link>
+      </button>
+      {isPending && <Spinner />}
     </div>
   );
 }
