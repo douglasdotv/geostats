@@ -8,6 +8,7 @@ import { GameTypeFilter } from '@/components/filter/GameTypeFilter';
 import { CountryStatsButton } from '@/components/stats/CountryStatsButton';
 import { getCountryStats } from '@/app/actions';
 import { ITEMS_PER_PAGE } from '@/lib/constants';
+import { isValidGameType, isValidMovementRestriction } from '@/lib/validation';
 
 export const dynamic = 'force-dynamic';
 
@@ -27,13 +28,17 @@ interface PageProps {
 
 export default async function Home({ searchParams }: PageProps) {
   const sp = await searchParams;
-  const page = Number(sp.page) || 1;
+  const page = Math.max(1, Number(sp.page) || 1);
   const sort = sp.sort ?? 'latest';
-  const country = sp.country ?? null;
-  const movement = sp.movement ?? null;
-  const gameType = sp.game_type ?? null;
+  const movement = isValidMovementRestriction(sp.movement) ? sp.movement : null;
+  const gameType = isValidGameType(sp.game_type) ? sp.game_type : null;
+
   const from = (page - 1) * ITEMS_PER_PAGE;
   const to = from + ITEMS_PER_PAGE - 1;
+
+  const { data: countries } = await supabase.rpc('get_unique_countries');
+  const country =
+    sp.country && countries?.includes(sp.country) ? sp.country : null;
 
   const { data: countResult } = await supabase.rpc('get_total_rounds_count', {
     country_filter: country,
@@ -54,7 +59,6 @@ export default async function Home({ searchParams }: PageProps) {
     },
   );
 
-  const { data: countries } = await supabase.rpc('get_unique_countries');
   const countryStats = await getCountryStats();
 
   if (error) {
