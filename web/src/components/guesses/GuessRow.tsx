@@ -123,7 +123,7 @@ export function GuessRow({
               rel='noopener noreferrer'
               className='text-blue-600 hover:text-blue-800'
               data-tooltip-id='guess-row-tooltip'
-              data-tooltip-content='Show in Street View'
+              data-tooltip-content='Open actual location in Google Street View'
             >
               🌐
             </a>
@@ -133,7 +133,7 @@ export function GuessRow({
               onClick={onShowMap}
               className='text-blue-600 hover:text-blue-800 cursor-pointer transition-colors'
               data-tooltip-id='guess-row-tooltip'
-              data-tooltip-content='Show in map'
+              data-tooltip-content='Display guess and actual location on an interactive map'
             >
               🗺️
             </button>
