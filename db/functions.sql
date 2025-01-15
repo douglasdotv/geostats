@@ -1,16 +1,45 @@
--- Get total count of unique rounds (each duels/challenge guess + each BR round) with optional country filter
-CREATE OR REPLACE FUNCTION get_total_rounds_count(country_filter TEXT DEFAULT NULL)
+-- Get total count of unique rounds (each duels/challenge guess + each BR round) with country/movement filters
+CREATE OR REPLACE FUNCTION get_total_rounds_count(
+  country_filter TEXT DEFAULT NULL,
+  movement_type TEXT DEFAULT NULL
+)
 RETURNS INTEGER AS $$
   WITH unique_rounds AS (
     SELECT DISTINCT game_id, round_number, game_type
     FROM guesses g1
     WHERE (g1.game_type IN ('duels', 'challenge')
-    AND (country_filter IS NULL OR g1.actual_country = country_filter))
+    AND (country_filter IS NULL OR g1.actual_country = country_filter)
+    AND (movement_type IS NULL 
+      OR (
+        CASE movement_type
+          WHEN 'moving' THEN NOT (g1.movement_restrictions->>'forbidMoving')::boolean
+          WHEN 'no_move' THEN (g1.movement_restrictions->>'forbidMoving')::boolean 
+            AND NOT ((g1.movement_restrictions->>'forbidZooming')::boolean 
+              AND (g1.movement_restrictions->>'forbidRotating')::boolean)
+          WHEN 'nmpz' THEN (g1.movement_restrictions->>'forbidMoving')::boolean 
+            AND (g1.movement_restrictions->>'forbidZooming')::boolean 
+            AND (g1.movement_restrictions->>'forbidRotating')::boolean
+        END
+      )
+    ))
     UNION ALL
     SELECT DISTINCT game_id, round_number, game_type
     FROM guesses g2
     WHERE g2.game_type = 'br'
     AND (country_filter IS NULL OR g2.actual_country = country_filter)
+    AND (movement_type IS NULL 
+      OR (
+        CASE movement_type
+          WHEN 'moving' THEN NOT (g2.movement_restrictions->>'forbidMoving')::boolean
+          WHEN 'no_move' THEN (g2.movement_restrictions->>'forbidMoving')::boolean 
+            AND NOT ((g2.movement_restrictions->>'forbidZooming')::boolean 
+              AND (g2.movement_restrictions->>'forbidRotating')::boolean)
+          WHEN 'nmpz' THEN (g2.movement_restrictions->>'forbidMoving')::boolean 
+            AND (g2.movement_restrictions->>'forbidZooming')::boolean 
+            AND (g2.movement_restrictions->>'forbidRotating')::boolean
+        END
+      )
+    )
     AND g2.distance = (
       SELECT MIN(g3.distance)
       FROM guesses g3
@@ -64,12 +93,13 @@ RETURNS SETOF TEXT AS $$
   ORDER BY actual_country;
 $$ LANGUAGE SQL;
 
--- Get guesses for pagination with has_additional_guesses flag and optional country filter
+-- Get guesses for pagination with has_additional_guesses flag and country/movement filters
 CREATE OR REPLACE FUNCTION get_sorted_guesses_paginated(
   page_start INTEGER,
   page_end INTEGER,
   sort_order TEXT DEFAULT 'latest',
-  country_filter TEXT DEFAULT NULL
+  country_filter TEXT DEFAULT NULL,
+  movement_type TEXT DEFAULT NULL
 )
 RETURNS SETOF guess_with_has_additional_guesses_flag AS $$
   WITH ranked_guesses AS (
@@ -119,6 +149,19 @@ RETURNS SETOF guess_with_has_additional_guesses_flag AS $$
       AND g2.round_number = g.round_number
     )))
     AND (country_filter IS NULL OR g.actual_country = country_filter)
+    AND (movement_type IS NULL 
+      OR (
+        CASE movement_type
+          WHEN 'moving' THEN NOT (g.movement_restrictions->>'forbidMoving')::boolean
+          WHEN 'no_move' THEN (g.movement_restrictions->>'forbidMoving')::boolean 
+            AND NOT ((g.movement_restrictions->>'forbidZooming')::boolean 
+              AND (g.movement_restrictions->>'forbidRotating')::boolean)
+          WHEN 'nmpz' THEN (g.movement_restrictions->>'forbidMoving')::boolean 
+            AND (g.movement_restrictions->>'forbidZooming')::boolean 
+            AND (g.movement_restrictions->>'forbidRotating')::boolean
+        END
+      )
+    )
     ORDER BY g.game_id, g.round_number, g.created_at DESC
   )
   SELECT * FROM ranked_guesses
