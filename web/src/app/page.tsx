@@ -3,6 +3,7 @@ import { GuessesTable } from '@/components/guesses/GuessesTable';
 import { PaginationControls } from '@/components/pagination/PaginationControls';
 import { SortControls } from '@/components/sort/SortControls';
 import { CountryFilter } from '@/components/filter/CountryFilter';
+import { MovementRestrictionFilter } from '@/components/filter/MovementRestrictionFilter';
 import { CountryStatsButton } from '@/components/stats/CountryStatsButton';
 import { getCountryStats } from '@/app/actions';
 import { ITEMS_PER_PAGE } from '@/lib/constants';
@@ -13,6 +14,7 @@ type SearchParamsContent = {
   page?: string;
   sort?: 'latest' | 'best' | 'worst';
   country?: string;
+  movement?: string;
 };
 
 type SearchParams = Promise<SearchParamsContent>;
@@ -26,11 +28,13 @@ export default async function Home({ searchParams }: PageProps) {
   const page = Number(sp.page) || 1;
   const sort = sp.sort ?? 'latest';
   const country = sp.country ?? null;
+  const movement = sp.movement ?? null;
   const from = (page - 1) * ITEMS_PER_PAGE;
   const to = from + ITEMS_PER_PAGE - 1;
 
   const { data: countResult } = await supabase.rpc('get_total_rounds_count', {
     country_filter: country,
+    movement_type: movement,
   });
   const count = countResult || 0;
 
@@ -41,6 +45,7 @@ export default async function Home({ searchParams }: PageProps) {
       page_end: to,
       sort_order: sort,
       country_filter: country,
+      movement_type: movement,
     },
   );
 
@@ -62,7 +67,10 @@ export default async function Home({ searchParams }: PageProps) {
       <div className='flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6'>
         <SortControls currentOption={sort} />
         <CountryStatsButton stats={countryStats} />
-        <CountryFilter countries={countries} currentCountry={country} />
+        <div className='flex flex-wrap gap-4'>
+          <CountryFilter countries={countries} currentCountry={country} />
+          <MovementRestrictionFilter currentMovementRestriction={movement} />
+        </div>
       </div>
       <GuessesTable guesses={guesses} />
       <PaginationControls
@@ -70,6 +78,7 @@ export default async function Home({ searchParams }: PageProps) {
         totalPages={totalPages}
         currentSort={sort}
         currentCountry={country}
+        currentMovementRestriction={movement}
       />
     </main>
   );
