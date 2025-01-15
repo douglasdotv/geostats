@@ -5,6 +5,7 @@ import { SortControls } from '@/components/sort/SortControls';
 import { CountryFilter } from '@/components/filter/CountryFilter';
 import { MovementRestrictionFilter } from '@/components/filter/MovementRestrictionFilter';
 import { GameTypeFilter } from '@/components/filter/GameTypeFilter';
+import { ResetFiltersButton } from '@/components/filter/ResetFiltersButton';
 import { CountryStatsButton } from '@/components/stats/CountryStatsButton';
 import { getCountryStats } from '@/app/actions';
 import { ITEMS_PER_PAGE } from '@/lib/constants';
@@ -81,6 +82,7 @@ export default async function Home({ searchParams }: PageProps) {
           <MovementRestrictionFilter currentMovementRestriction={movement} />
           <GameTypeFilter currentGameType={gameType} />
         </div>
+        <ResetFiltersButton />
       </div>
       <GuessesTable guesses={guesses} />
       <PaginationControls
