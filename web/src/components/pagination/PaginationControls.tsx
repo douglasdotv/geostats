@@ -4,6 +4,7 @@ import { useTransition } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Spinner } from '@/components/shared/Spinner';
 import { MovementRestrictionType } from '@/types/movement';
+import { GameType } from '@/types/gametype';
 
 interface PaginationControlsProps {
   readonly currentPage: number;
@@ -11,6 +12,7 @@ interface PaginationControlsProps {
   readonly currentSort: string;
   readonly currentCountry: string | null;
   readonly currentMovementRestriction: MovementRestrictionType | null;
+  readonly currentGameType: GameType | null;
 }
 
 export function PaginationControls({
@@ -19,6 +21,7 @@ export function PaginationControls({
   currentSort,
   currentCountry,
   currentMovementRestriction,
+  currentGameType,
 }: PaginationControlsProps) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
@@ -28,12 +31,19 @@ export function PaginationControls({
     const params = new URLSearchParams(searchParams.toString());
     params.set('page', page.toString());
     params.set('sort', currentSort);
+
     if (currentCountry) {
       params.set('country', currentCountry);
     }
+
     if (currentMovementRestriction) {
       params.set('movement', currentMovementRestriction);
     }
+
+    if (currentGameType && currentGameType !== 'all') {
+      params.set('game_type', currentGameType);
+    }
+
     return params;
   };
 

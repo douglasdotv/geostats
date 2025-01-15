@@ -3,6 +3,7 @@ import {
   MovementRestrictionType,
   MOVEMENT_RESTRICTION_TYPES,
 } from '@/types/movement';
+import { GameType, GAME_TYPES } from '@/types/gametype';
 
 export const isRawCountryStats = (data: unknown): data is RawCountryStats[] => {
   if (!Array.isArray(data)) return false;
@@ -25,4 +26,11 @@ export const isValidMovementRestriction = (
     return false;
   }
   return MOVEMENT_RESTRICTION_TYPES.includes(value);
+};
+
+export const isValidGameType = (value: unknown): value is GameType => {
+  if (typeof value !== 'string') {
+    return false;
+  }
+  return GAME_TYPES.includes(value);
 };

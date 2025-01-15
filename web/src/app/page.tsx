@@ -4,6 +4,7 @@ import { PaginationControls } from '@/components/pagination/PaginationControls';
 import { SortControls } from '@/components/sort/SortControls';
 import { CountryFilter } from '@/components/filter/CountryFilter';
 import { MovementRestrictionFilter } from '@/components/filter/MovementRestrictionFilter';
+import { GameTypeFilter } from '@/components/filter/GameTypeFilter';
 import { CountryStatsButton } from '@/components/stats/CountryStatsButton';
 import { getCountryStats } from '@/app/actions';
 import { ITEMS_PER_PAGE } from '@/lib/constants';
@@ -15,6 +16,7 @@ type SearchParamsContent = {
   sort?: 'latest' | 'best' | 'worst';
   country?: string;
   movement?: string;
+  game_type?: string;
 };
 
 type SearchParams = Promise<SearchParamsContent>;
@@ -29,14 +31,16 @@ export default async function Home({ searchParams }: PageProps) {
   const sort = sp.sort ?? 'latest';
   const country = sp.country ?? null;
   const movement = sp.movement ?? null;
+  const gameType = sp.game_type ?? null;
   const from = (page - 1) * ITEMS_PER_PAGE;
   const to = from + ITEMS_PER_PAGE - 1;
 
   const { data: countResult } = await supabase.rpc('get_total_rounds_count', {
     country_filter: country,
     movement_type: movement,
+    game_type_filter: gameType === 'all' ? null : gameType,
   });
-  const count = countResult || 0;
+  const count = countResult ?? 0;
 
   const { data: guesses, error } = await supabase.rpc(
     'get_sorted_guesses_paginated',
@@ -46,6 +50,7 @@ export default async function Home({ searchParams }: PageProps) {
       sort_order: sort,
       country_filter: country,
       movement_type: movement,
+      game_type_filter: gameType === 'all' ? null : gameType,
     },
   );
 
@@ -70,6 +75,7 @@ export default async function Home({ searchParams }: PageProps) {
         <div className='flex flex-wrap gap-4'>
           <CountryFilter countries={countries} currentCountry={country} />
           <MovementRestrictionFilter currentMovementRestriction={movement} />
+          <GameTypeFilter currentGameType={gameType} />
         </div>
       </div>
       <GuessesTable guesses={guesses} />
@@ -79,6 +85,7 @@ export default async function Home({ searchParams }: PageProps) {
         currentSort={sort}
         currentCountry={country}
         currentMovementRestriction={movement}
+        currentGameType={gameType}
       />
     </main>
   );
