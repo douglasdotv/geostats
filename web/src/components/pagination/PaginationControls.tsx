@@ -3,12 +3,14 @@
 import { useTransition } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Spinner } from '@/components/shared/Spinner';
+import { MovementRestrictionType } from '@/types/movement';
 
 interface PaginationControlsProps {
   readonly currentPage: number;
   readonly totalPages: number;
   readonly currentSort: string;
   readonly currentCountry: string | null;
+  readonly currentMovementRestriction: MovementRestrictionType | null;
 }
 
 export function PaginationControls({
@@ -16,6 +18,7 @@ export function PaginationControls({
   totalPages,
   currentSort,
   currentCountry,
+  currentMovementRestriction,
 }: PaginationControlsProps) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
@@ -27,6 +30,9 @@ export function PaginationControls({
     params.set('sort', currentSort);
     if (currentCountry) {
       params.set('country', currentCountry);
+    }
+    if (currentMovementRestriction) {
+      params.set('movement', currentMovementRestriction);
     }
     return params;
   };
