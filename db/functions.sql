@@ -1,7 +1,8 @@
--- Get total count of unique rounds (each duels/challenge guess + each BR round) with country/movement filters
+-- Get total count of unique rounds (each duels/challenge guess + each BR round) with country/movement/gametype filters
 CREATE OR REPLACE FUNCTION get_total_rounds_count(
   country_filter TEXT DEFAULT NULL,
-  movement_type TEXT DEFAULT NULL
+  movement_type TEXT DEFAULT NULL,
+  game_type_filter TEXT DEFAULT NULL
 )
 RETURNS INTEGER AS $$
   WITH unique_rounds AS (
@@ -9,6 +10,7 @@ RETURNS INTEGER AS $$
     FROM guesses g1
     WHERE (g1.game_type IN ('duels', 'challenge')
     AND (country_filter IS NULL OR g1.actual_country = country_filter)
+    AND (game_type_filter IS NULL OR g1.game_type = game_type_filter)
     AND (movement_type IS NULL 
       OR (
         CASE movement_type
@@ -27,6 +29,7 @@ RETURNS INTEGER AS $$
     FROM guesses g2
     WHERE g2.game_type = 'br'
     AND (country_filter IS NULL OR g2.actual_country = country_filter)
+    AND (game_type_filter IS NULL OR g2.game_type = game_type_filter)
     AND (movement_type IS NULL 
       OR (
         CASE movement_type
@@ -93,13 +96,14 @@ RETURNS SETOF TEXT AS $$
   ORDER BY actual_country;
 $$ LANGUAGE SQL;
 
--- Get guesses for pagination with has_additional_guesses flag and country/movement filters
+-- Get guesses for pagination with has_additional_guesses flag and country/movement/gametype filters
 CREATE OR REPLACE FUNCTION get_sorted_guesses_paginated(
   page_start INTEGER,
   page_end INTEGER,
   sort_order TEXT DEFAULT 'latest',
   country_filter TEXT DEFAULT NULL,
-  movement_type TEXT DEFAULT NULL
+  movement_type TEXT DEFAULT NULL,
+  game_type_filter TEXT DEFAULT NULL
 )
 RETURNS SETOF guess_with_has_additional_guesses_flag AS $$
   WITH ranked_guesses AS (
@@ -149,6 +153,7 @@ RETURNS SETOF guess_with_has_additional_guesses_flag AS $$
       AND g2.round_number = g.round_number
     )))
     AND (country_filter IS NULL OR g.actual_country = country_filter)
+    AND (game_type_filter IS NULL OR g.game_type = game_type_filter)
     AND (movement_type IS NULL 
       OR (
         CASE movement_type
