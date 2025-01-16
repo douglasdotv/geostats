@@ -5,10 +5,8 @@ import { SortControls } from '@/components/controls/SortControls';
 import { FilterControls } from '@/components/controls/FilterControls';
 import { ResetFiltersButton } from '@/components/controls/filters/ResetFiltersButton';
 import { RefreshTableButton } from '@/components/controls/RefreshTableButton';
-import { CountryStatsButton } from '@/components/stats/CountryStatsButton';
 import { MovementRestrictionType } from '@/types/movement';
 import { GameType } from '@/types/gametype';
-import { CountryStats } from '@/types/stats';
 
 interface TableControlsProps {
   readonly currentSort: string;
@@ -16,7 +14,6 @@ interface TableControlsProps {
   readonly currentCountry: string | null;
   readonly currentMovementRestriction: MovementRestrictionType | null;
   readonly currentGameType: GameType | null;
-  readonly stats: CountryStats[];
 }
 
 export function TableControls({
@@ -25,7 +22,6 @@ export function TableControls({
   currentCountry,
   currentMovementRestriction,
   currentGameType,
-  stats,
 }: TableControlsProps) {
   const [isOptionsOpen, setIsOptionsOpen] = useState(false);
 
@@ -52,7 +48,6 @@ export function TableControls({
             </span>
           )}
         </button>
-        <CountryStatsButton stats={stats} />
 
         <div className='ml-auto'>
           <RefreshTableButton />
