@@ -27,7 +27,9 @@ export function GuessRow({
   isLoading = false,
   onShowMap,
 }: GuessRowProps) {
-  const subRowClass = isSubRow ? 'bg-gray-100 dark:bg-gray-800' : '';
+  const rowClass = isSubRow
+    ? 'bg-gray-50/50 dark:bg-gray-800/50'
+    : 'hover:bg-gray-50/50 dark:hover:bg-gray-800/50';
 
   function getCountryCode(countryName: string | null) {
     if (!countryName) return null;
@@ -45,9 +47,15 @@ export function GuessRow({
   ) {
     const code = getCountryCode(countryName);
     return (
-      <div className='inline-flex items-center space-x-2'>
+      <div
+        className='flex items-center gap-2'
+        data-tooltip-id='guess-row-tooltip'
+        data-tooltip-content={displayName ?? 'Unknown'}
+      >
         {code && <CountryFlag countryCode={code} countryName={countryName} />}
-        <span>{displayName ?? 'Unknown'}</span>
+        <span className='truncate max-w-[200px]'>
+          {displayName ?? 'Unknown'}
+        </span>
       </div>
     );
   }
@@ -70,61 +78,66 @@ export function GuessRow({
     brTooltipContent = 'Show additional guesses for this round';
   }
 
+  const gameTypeContent = `${guess.game_type}/${formatMovementRestrictions(guess.movement_restrictions)}`;
+
   return (
-    <tr
-      className={`border-b hover:bg-gray-50 dark:hover:bg-gray-900 ${subRowClass}`}
-    >
-      <td className='py-2 pr-4'>
-        {isExpandable && (
-          <button
-            onClick={onToggle}
-            className='mr-2 px-1 text-xs border rounded'
-            disabled={isLoading}
-            data-tooltip-id='guess-row-tooltip'
-            data-tooltip-content={brTooltipContent}
-          >
-            {getButtonText()}
-          </button>
-        )}
-        {guess.game_type}/
-        {formatMovementRestrictions(guess.movement_restrictions)}
+    <tr className={`transition-all duration-200 ${rowClass}`}>
+      <td className='px-4 py-3'>
+        <div className='flex items-center justify-center gap-2'>
+          {isExpandable && (
+            <button
+              onClick={onToggle}
+              className='px-2 py-0.5 text-xs bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors'
+              disabled={isLoading}
+              data-tooltip-id='guess-row-tooltip'
+              data-tooltip-content={brTooltipContent}
+            >
+              {getButtonText()}
+            </button>
+          )}
+          <span className='truncate text-gray-600 dark:text-gray-300'>
+            {gameTypeContent}
+          </span>
+        </div>
       </td>
-      <td className='py-2 pr-4'>
+      <td className='px-4 py-3'>
         {renderLocation(guess.guess_display_name, guess.guess_country)}
       </td>
-      <td className='py-2 pr-4'>
+      <td className='px-4 py-3'>
         {renderLocation(guess.actual_display_name, guess.actual_country)}
       </td>
-      <td className='py-2 pr-4'>
+      <td className='px-4 py-3 text-center'>
         <DistanceCell distance={guess.distance} />
       </td>
-      <td className='py-2 pr-4'>{formatRelativeTime(guess.guess_time)}</td>
-      <td className='py-2 pr-4'>
+      <td className='px-4 py-3 text-center whitespace-nowrap text-gray-600 dark:text-gray-300'>
+        {formatRelativeTime(guess.guess_time)}
+      </td>
+      <td className='px-4 py-3 text-center whitespace-nowrap text-gray-600 dark:text-gray-300'>
         {getTimeToGuess(guess.guess_time, guess.round_start_time)}
       </td>
-      <td className='py-2 pr-4'>
-        <div className='flex gap-2'>
-          {hasActualLocation && (
-            <a
-              href={`https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${guess.actual_lat},${guess.actual_lng}`}
-              target='_blank'
-              rel='noopener noreferrer'
-              className='text-blue-600 hover:text-blue-800'
-              data-tooltip-id='guess-row-tooltip'
-              data-tooltip-content='Open actual location in Google Street View'
-            >
-              🌐
-            </a>
-          )}
+      <td className='px-4 py-3'>
+        <div className='flex justify-center gap-2'>
           {canShowMap && (
             <button
               onClick={onShowMap}
-              className='text-blue-600 hover:text-blue-800 cursor-pointer transition-colors'
+              className='text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 transition-colors'
               data-tooltip-id='guess-row-tooltip'
               data-tooltip-content='Display guess and actual location on an interactive map'
             >
               🗺️
             </button>
+          )}
+          {hasActualLocation && (
+            <a
+              href={`https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${guess.actual_lat},${guess.actual_lng}`}
+              target='_blank'
+              rel='noopener noreferrer'
+              className='text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 transition-colors'
+              data-tooltip-id='guess-row-tooltip'
+              data-tooltip-content='Open actual location in Google Street View'
+            >
+              🌐
+            </a>
           )}
         </div>
       </td>
