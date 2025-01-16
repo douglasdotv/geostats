@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { SortControls } from '@/components/controls/SortControls';
 import { FilterControls } from '@/components/controls/FilterControls';
 import { ResetFiltersButton } from '@/components/controls/filters/ResetFiltersButton';
+import { RefreshTableButton } from '@/components/controls/RefreshTableButton';
 import { CountryStatsButton } from '@/components/stats/CountryStatsButton';
 import { MovementRestrictionType } from '@/types/movement';
 import { GameType } from '@/types/gametype';
@@ -52,6 +53,10 @@ export function TableControls({
           )}
         </button>
         <CountryStatsButton stats={stats} />
+
+        <div className='ml-auto'>
+          <RefreshTableButton />
+        </div>
       </div>
 
       {isOptionsOpen && (
