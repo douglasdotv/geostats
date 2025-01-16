@@ -36,7 +36,8 @@ export function CountryFilter({
       <select
         value={currentCountry ?? ''}
         onChange={handleChange}
-        className='px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors'
+        className='w-full px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors'
+        aria-label='Filter by country'
       >
         <option value=''>All Countries</option>
         {countries.map((country) => (

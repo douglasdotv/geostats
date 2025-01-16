@@ -1,12 +1,7 @@
 import { supabase } from '@/lib/supabaseClient';
 import { GuessesTable } from '@/components/guesses/GuessesTable';
 import { PaginationControls } from '@/components/pagination/PaginationControls';
-import { SortControls } from '@/components/sort/SortControls';
-import { CountryFilter } from '@/components/filter/CountryFilter';
-import { MovementRestrictionFilter } from '@/components/filter/MovementRestrictionFilter';
-import { GameTypeFilter } from '@/components/filter/GameTypeFilter';
-import { ResetFiltersButton } from '@/components/filter/ResetFiltersButton';
-import { CountryStatsButton } from '@/components/stats/CountryStatsButton';
+import { TableControls } from '@/components/controls/TableControls';
 import { getCountryStats } from '@/app/actions';
 import { ITEMS_PER_PAGE } from '@/lib/constants';
 import { isValidGameType, isValidMovementRestriction } from '@/lib/validation';
@@ -74,16 +69,14 @@ export default async function Home({ searchParams }: PageProps) {
 
   return (
     <main className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'>
-      <div className='flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6'>
-        <SortControls currentOption={sort} />
-        <CountryStatsButton stats={countryStats} />
-        <div className='flex flex-wrap gap-4'>
-          <CountryFilter countries={countries} currentCountry={country} />
-          <MovementRestrictionFilter currentMovementRestriction={movement} />
-          <GameTypeFilter currentGameType={gameType} />
-        </div>
-        <ResetFiltersButton />
-      </div>
+      <TableControls
+        currentSort={sort}
+        countries={countries}
+        currentCountry={country}
+        currentMovementRestriction={movement}
+        currentGameType={gameType}
+        stats={countryStats}
+      />
       <GuessesTable guesses={guesses} />
       <PaginationControls
         currentPage={page}
