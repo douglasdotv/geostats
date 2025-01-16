@@ -1,10 +1,22 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AboutModal } from '@/components/about/AboutModal';
+import { CountryStatsButton } from '@/components/stats/CountryStatsButton';
+import { getCountryStats } from '@/app/actions';
+import { CountryStats } from '@/types/stats';
 
 export function Header() {
   const [showAbout, setShowAbout] = useState(false);
+  const [countryStats, setCountryStats] = useState<CountryStats[]>([]);
+
+  useEffect(() => {
+    const fetchCountryStats = async () => {
+      const stats = await getCountryStats();
+      setCountryStats(stats);
+    };
+    fetchCountryStats();
+  }, []);
 
   return (
     <>
@@ -14,7 +26,8 @@ export function Header() {
             <div className='flex items-center'>
               <span className='text-xl font-bold'>GeoStats</span>
             </div>
-            <div>
+            <div className='flex items-center gap-4'>
+              <CountryStatsButton stats={countryStats} />
               <button
                 onClick={() => setShowAbout(true)}
                 className='px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors'
