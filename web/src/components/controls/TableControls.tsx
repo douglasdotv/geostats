@@ -33,7 +33,7 @@ export function TableControls({
   ].filter(Boolean).length;
 
   return (
-    <div className='space-y-4 mb-6'>
+    <div className='space-y-2'>
       <div className='flex items-center gap-4'>
         <button
           onClick={() => setIsOptionsOpen(!isOptionsOpen)}
