@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import ReactCountryFlag from 'react-country-flag';
 import lookup from 'country-code-lookup';
+import { CountryFlag } from '@/components/shared/CountryFlag';
 import { CountryStats } from '@/types/stats';
 import { formatDistance } from '@/lib/utils';
 
@@ -59,6 +59,31 @@ export function CountryStatsModal({
     100
   ).toFixed(1);
 
+  const renderStatRow = (stat: CountryStats) => {
+    const countryCode = getCountryCode(stat.country);
+    return (
+      <div
+        key={stat.country}
+        className='flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded'
+      >
+        <div className='flex items-center gap-2'>
+          {countryCode && (
+            <CountryFlag countryCode={countryCode} countryName={stat.country} />
+          )}
+          <span>{stat.country}</span>
+        </div>
+        <div className='flex items-center gap-4'>
+          <span className='text-sm text-gray-500 dark:text-gray-400'>
+            {stat.correctGuesses}/{stat.totalGuesses}
+          </span>
+          <span className='font-mono w-16 text-right'>
+            {stat.correctPercentage.toFixed(1)}%
+          </span>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className='fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-[fadeIn_0.2s_ease-out]'>
       <div className='bg-white dark:bg-gray-900 rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col animate-[scaleIn_0.2s_ease-out]'>
@@ -89,68 +114,14 @@ export function CountryStatsModal({
             <div>
               <h3 className='text-lg font-semibold mb-4'>Top 5 Countries</h3>
               <div className='space-y-3'>
-                {bestCountries.map((stat) => {
-                  const countryCode = getCountryCode(stat.country);
-                  return (
-                    <div
-                      key={stat.country}
-                      className='flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded'
-                    >
-                      <div className='flex items-center gap-2'>
-                        {countryCode && (
-                          <ReactCountryFlag
-                            countryCode={countryCode}
-                            svg
-                            className='rounded-sm'
-                          />
-                        )}
-                        <span>{stat.country}</span>
-                      </div>
-                      <div className='flex items-center gap-4'>
-                        <span className='text-sm text-gray-500 dark:text-gray-400'>
-                          {stat.correctGuesses}/{stat.totalGuesses}
-                        </span>
-                        <span className='font-mono w-16 text-right'>
-                          {stat.correctPercentage.toFixed(1)}%
-                        </span>
-                      </div>
-                    </div>
-                  );
-                })}
+                {bestCountries.map(renderStatRow)}
               </div>
             </div>
 
             <div>
               <h3 className='text-lg font-semibold mb-4'>Bottom 5 Countries</h3>
               <div className='space-y-3'>
-                {worstCountries.map((stat) => {
-                  const countryCode = getCountryCode(stat.country);
-                  return (
-                    <div
-                      key={stat.country}
-                      className='flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded'
-                    >
-                      <div className='flex items-center gap-2'>
-                        {countryCode && (
-                          <ReactCountryFlag
-                            countryCode={countryCode}
-                            svg
-                            className='rounded-sm'
-                          />
-                        )}
-                        <span>{stat.country}</span>
-                      </div>
-                      <div className='flex items-center gap-4'>
-                        <span className='text-sm text-gray-500 dark:text-gray-400'>
-                          {stat.correctGuesses}/{stat.totalGuesses}
-                        </span>
-                        <span className='font-mono w-16 text-right'>
-                          {stat.correctPercentage.toFixed(1)}%
-                        </span>
-                      </div>
-                    </div>
-                  );
-                })}
+                {worstCountries.map(renderStatRow)}
               </div>
             </div>
           </div>
@@ -167,36 +138,7 @@ export function CountryStatsModal({
           {displayStats && (
             <div className='mt-8'>
               <h3 className='text-lg font-semibold mb-4'>All Countries</h3>
-              <div className='space-y-2'>
-                {displayStats.map((stat) => {
-                  const countryCode = getCountryCode(stat.country);
-                  return (
-                    <div
-                      key={stat.country}
-                      className='flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded'
-                    >
-                      <div className='flex items-center gap-2'>
-                        {countryCode && (
-                          <ReactCountryFlag
-                            countryCode={countryCode}
-                            svg
-                            className='rounded-sm'
-                          />
-                        )}
-                        <span>{stat.country}</span>
-                      </div>
-                      <div className='flex items-center gap-4'>
-                        <span className='text-sm text-gray-500 dark:text-gray-400'>
-                          {stat.correctGuesses}/{stat.totalGuesses}
-                        </span>
-                        <span className='font-mono w-16 text-right'>
-                          {stat.correctPercentage.toFixed(1)}%
-                        </span>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+              <div className='space-y-2'>{displayStats.map(renderStatRow)}</div>
             </div>
           )}
         </div>

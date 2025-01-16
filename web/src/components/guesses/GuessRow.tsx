@@ -1,11 +1,11 @@
 import { Guess } from '@/types/guess';
 import { DistanceCell } from '@/components/guesses/DistanceCell';
+import { CountryFlag } from '@/components/shared/CountryFlag';
 import {
   formatRelativeTime,
   formatMovementRestrictions,
   getTimeToGuess,
 } from '@/lib/utils';
-import ReactCountryFlag from 'react-country-flag';
 import lookup from 'country-code-lookup';
 
 interface GuessRowProps {
@@ -33,32 +33,20 @@ export function GuessRow({
     if (!countryName) return null;
     try {
       const country = lookup.byCountry(countryName);
-      return country?.iso2;
+      return country?.iso2 ?? null;
     } catch {
       return null;
     }
-  }
-
-  function renderFlag(countryName: string | null) {
-    const code = getCountryCode(countryName);
-    if (!code) return null;
-    return (
-      <ReactCountryFlag
-        countryCode={code}
-        svg
-        className='mr-2'
-        aria-label={countryName ?? 'Unknown country'}
-      />
-    );
   }
 
   function renderLocation(
     displayName: string | null,
     countryName: string | null,
   ) {
+    const code = getCountryCode(countryName);
     return (
-      <div className='flex items-center'>
-        {renderFlag(countryName)}
+      <div className='inline-flex items-center space-x-2'>
+        {code && <CountryFlag countryCode={code} countryName={countryName} />}
         <span>{displayName ?? 'Unknown'}</span>
       </div>
     );
