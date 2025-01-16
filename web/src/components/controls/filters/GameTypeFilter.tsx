@@ -28,7 +28,6 @@ export function GameTypeFilter({ currentGameType }: GameTypeFilterProps) {
     } else {
       params.set('game_type', gameType);
     }
-
     params.set('page', '1');
 
     startTransition(() => {
@@ -41,7 +40,8 @@ export function GameTypeFilter({ currentGameType }: GameTypeFilterProps) {
       <select
         value={currentGameType ?? 'all'}
         onChange={handleChange}
-        className='px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors'
+        className='w-full px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors'
+        aria-label='Filter by game type'
       >
         <option value='all'>All Game Types</option>
         <option value='duels'>Duels</option>
