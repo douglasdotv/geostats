@@ -12,18 +12,18 @@ export function CountryFlag({
   className = '',
 }: CountryFlagProps) {
   return (
-    <ReactCountryFlag
-      countryCode={countryCode}
-      svg
-      className={`align-middle ${className}`}
-      style={{
-        width: '1.5em',
-        height: '1.5em',
-        border: '1px solid black',
-        borderRadius: '50%',
-        objectFit: 'cover',
-      }}
-      aria-label={countryName ?? 'Unknown country'}
-    />
+    <div className={`flex items-center justify-center ${className}`}>
+      <ReactCountryFlag
+        countryCode={countryCode}
+        svg
+        className='aspect-square w-[1.5em] sm:w-[2em] md:w-[3em]'
+        style={{
+          border: '1px solid black',
+          borderRadius: '50%',
+          objectFit: 'cover',
+        }}
+        aria-label={countryName ?? 'Unknown country'}
+      />
+    </div>
   );
 }
