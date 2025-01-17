@@ -10,9 +10,13 @@ import 'react-tooltip/dist/react-tooltip.css';
 
 interface GuessesTableProps {
   readonly guesses: GuessWithAdditionalGuesses[];
+  readonly availableCountries: string[];
 }
 
-export function GuessesTable({ guesses }: GuessesTableProps) {
+export function GuessesTable({
+  guesses,
+  availableCountries,
+}: GuessesTableProps) {
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
   const [additionalGuesses, setAdditionalGuesses] = useState<
     Record<string, Guess[]>
@@ -112,6 +116,7 @@ export function GuessesTable({ guesses }: GuessesTableProps) {
                     <Fragment key={rowKey}>
                       <GuessRow
                         guess={guess}
+                        availableCountries={availableCountries}
                         isExpandable={guess.has_additional_guesses}
                         isExpanded={isExpanded}
                         onToggle={() =>
@@ -133,6 +138,7 @@ export function GuessesTable({ guesses }: GuessesTableProps) {
                             isExpanded={false}
                             isSubRow
                             onShowMap={() => setActiveMapGuess(g)}
+                            availableCountries={availableCountries}
                           />
                         ))}
                     </Fragment>

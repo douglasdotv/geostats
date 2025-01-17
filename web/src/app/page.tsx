@@ -74,7 +74,7 @@ export default async function Home({ searchParams }: PageProps) {
           currentMovementRestriction={movement}
           currentGameType={gameType}
         />
-        <GuessesTable guesses={guesses} />
+        <GuessesTable guesses={guesses} availableCountries={countries} />
         <PaginationControls
           currentPage={page}
           totalPages={totalPages}
