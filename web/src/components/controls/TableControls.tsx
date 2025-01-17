@@ -37,7 +37,7 @@ export function TableControls({
       <div className='flex items-center gap-4'>
         <button
           onClick={() => setIsOptionsOpen(!isOptionsOpen)}
-          className='flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors'
+          className='flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-md border border-gray-300 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors'
           aria-expanded={isOptionsOpen}
           aria-haspopup='true'
         >
