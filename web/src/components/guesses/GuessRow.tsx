@@ -1,6 +1,6 @@
 import { Guess } from '@/types/guess';
 import { DistanceCell } from '@/components/guesses/DistanceCell';
-import { CountryFlag } from '@/components/shared/CountryFlag';
+import { ClickableCountryFlag } from '@/components/shared/ClickableCountryFlag';
 import {
   formatRelativeTime,
   formatMovementRestrictions,
@@ -52,7 +52,9 @@ export function GuessRow({
         data-tooltip-id='guess-row-tooltip'
         data-tooltip-content={displayName ?? 'Unknown'}
       >
-        {code && <CountryFlag countryCode={code} countryName={countryName} />}
+        {code && (
+          <ClickableCountryFlag countryCode={code} countryName={countryName} />
+        )}
         <span className='truncate max-w-[200px]'>
           {displayName ?? 'Unknown'}
         </span>
