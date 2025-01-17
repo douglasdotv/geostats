@@ -23,13 +23,19 @@
 
 body {
   color: var(--foreground);
-  background: linear-gradient(
-    135deg,
-    var(--gradient-start) 0%,
-    var(--gradient-middle) 50%,
-    var(--gradient-end) 100%
-  );
+  background-image: url('/background.jpg'),
+    linear-gradient(
+      135deg,
+      var(--gradient-start) 0%,
+      var(--gradient-middle) 50%,
+      var(--gradient-end) 100%
+    );
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-blend-mode: overlay;
   min-height: 100vh;
+  backdrop-filter: blur(5px);
 }
 
 ::-webkit-scrollbar {
