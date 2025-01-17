@@ -1,10 +1,16 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { Audiowide } from 'next/font/google';
 import { AboutModal } from '@/components/about/AboutModal';
 import { CountryStatsButton } from '@/components/stats/CountryStatsButton';
 import { getCountryStats } from '@/app/actions';
 import { CountryStats } from '@/types/stats';
+
+const audiowide = Audiowide({
+  weight: '400',
+  subsets: ['latin'],
+});
 
 export function Header() {
   const [showAbout, setShowAbout] = useState(false);
@@ -24,7 +30,9 @@ export function Header() {
         <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
           <div className='flex justify-between items-center h-16'>
             <div className='flex items-center'>
-              <span className='text-xl font-bold'>GeoStats</span>
+              <span className={`text-xl font-bold ${audiowide.className}`}>
+                GeoStats
+              </span>
             </div>
             <div className='flex items-center gap-4'>
               <CountryStatsButton stats={countryStats} />
