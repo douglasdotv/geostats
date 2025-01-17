@@ -10,6 +10,7 @@ import lookup from 'country-code-lookup';
 
 interface GuessRowProps {
   readonly guess: Guess;
+  readonly availableCountries: string[];
   readonly isExpandable?: boolean;
   readonly isExpanded?: boolean;
   readonly onToggle?: () => void;
@@ -20,6 +21,7 @@ interface GuessRowProps {
 
 export function GuessRow({
   guess,
+  availableCountries,
   isExpandable = false,
   isExpanded = false,
   onToggle,
@@ -53,7 +55,11 @@ export function GuessRow({
         data-tooltip-content={displayName ?? 'Unknown'}
       >
         {code && (
-          <ClickableCountryFlag countryCode={code} countryName={countryName} />
+          <ClickableCountryFlag
+            countryCode={code}
+            countryName={countryName}
+            availableCountries={availableCountries}
+          />
         )}
         <span className='truncate max-w-[200px]'>
           {displayName ?? 'Unknown'}
