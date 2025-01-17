@@ -20,6 +20,32 @@ body {
   background: var(--background);
 }
 
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgb(243 244 246 / 0.1);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgb(156 163 175 / 0.5);
+  border-radius: 5px;
+  transition: background 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(156 163 175 / 0.8);
+}
+
+@supports (scrollbar-color: auto) {
+  * {
+    scrollbar-color: rgb(156 163 175 / 0.5) rgb(243 244 246 / 0.1);
+    scrollbar-width: thin;
+  }
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
