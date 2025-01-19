@@ -2,11 +2,12 @@ import { Guess } from '@/types/guess';
 import { DistanceCell } from '@/components/guesses/DistanceCell';
 import { ClickableCountryFlag } from '@/components/shared/ClickableCountryFlag';
 import {
-  formatRelativeTime,
-  formatMovementRestrictions,
   getTimeToGuess,
+  formatMovementRestrictions,
+  formatRelativeTime,
 } from '@/lib/utils';
 import lookup from 'country-code-lookup';
+import { FiPlus, FiMinus, FiMap, FiGlobe } from 'react-icons/fi';
 
 interface GuessRowProps {
   readonly guess: Guess;
@@ -29,10 +30,6 @@ export function GuessRow({
   isLoading = false,
   onShowMap,
 }: GuessRowProps) {
-  const rowClass = isSubRow
-    ? 'bg-gray-50/50 dark:bg-gray-800/50'
-    : 'hover:bg-gray-50/50 dark:hover:bg-gray-800/50';
-
   function getCountryCode(countryName: string | null) {
     if (!countryName) return null;
     try {
@@ -68,14 +65,12 @@ export function GuessRow({
     );
   }
 
-  function getButtonText() {
+  function getToggleIcon() {
     if (isLoading) return '...';
-    return isExpanded ? '-' : '+';
+    return isExpanded ? <FiMinus size={16} /> : <FiPlus size={16} />;
   }
 
-  const hasActualLocation = Boolean(guess.actual_lat && guess.actual_lng);
-  const hasGuessLocation = Boolean(guess.guess_lat && guess.guess_lng);
-  const canShowMap = hasActualLocation && hasGuessLocation;
+  const gameTypeContent = `${guess.game_type}/${formatMovementRestrictions(guess.movement_restrictions)}`;
 
   let brTooltipContent: string;
   if (isLoading) {
@@ -86,23 +81,29 @@ export function GuessRow({
     brTooltipContent = 'Show additional guesses for this round';
   }
 
-  const gameTypeContent = `${guess.game_type}/${formatMovementRestrictions(guess.movement_restrictions)}`;
+  const rowClass = isSubRow
+    ? 'bg-red-100 dark:bg-red-800 hover:bg-red-200 dark:hover:bg-red-700'
+    : 'hover:bg-gray-50 dark:hover:bg-gray-800';
+
+  const hasActualLocation = Boolean(guess.actual_lat && guess.actual_lng);
+  const hasGuessLocation = Boolean(guess.guess_lat && guess.guess_lng);
+  const canShowMap = hasActualLocation && hasGuessLocation;
 
   return (
     <tr className={`transition-all duration-200 ${rowClass}`}>
-      <td className='px-4 py-3'>
-        <div className='flex items-center justify-center gap-2'>
-          {isExpandable && (
-            <button
-              onClick={onToggle}
-              className='px-2 py-0.5 text-xs bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors'
-              disabled={isLoading}
-              data-tooltip-id='guess-row-tooltip'
-              data-tooltip-content={brTooltipContent}
-            >
-              {getButtonText()}
-            </button>
-          )}
+      <td className='px-4 py-3 relative'>
+        {isExpandable && (
+          <button
+            onClick={onToggle}
+            className='absolute left-2 top-1/2 transform -translate-y-1/2 flex items-center justify-center w-6 h-6 text-xs bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors'
+            disabled={isLoading}
+            data-tooltip-id='guess-row-tooltip'
+            data-tooltip-content={brTooltipContent}
+          >
+            {getToggleIcon()}
+          </button>
+        )}
+        <div className='flex justify-center'>
           <span className='truncate text-gray-600 dark:text-gray-300'>
             {gameTypeContent}
           </span>
@@ -132,7 +133,7 @@ export function GuessRow({
               data-tooltip-id='guess-row-tooltip'
               data-tooltip-content='Display guess and actual location on an interactive map'
             >
-              🗺️
+              <FiMap />
             </button>
           )}
           {hasActualLocation && (
@@ -144,7 +145,7 @@ export function GuessRow({
               data-tooltip-id='guess-row-tooltip'
               data-tooltip-content='Open actual location in Google Street View'
             >
-              🌐
+              <FiGlobe />
             </a>
           )}
         </div>
