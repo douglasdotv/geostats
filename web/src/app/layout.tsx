@@ -15,8 +15,17 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://geostats.info'),
   title: 'GeoStats',
-  description: 'GeoGuessr gameplay statistics visualization',
+  description: 'A website to visualize GeoGuessr locations and statistics.',
+  keywords: [
+    'geoguessr',
+    'maps',
+    'geography',
+    'statistics',
+    'location tracking',
+  ],
+  authors: [{ name: 'Douglas Vieira' }],
   icons: {
     icon: [
       { url: '/favicon.ico' },
