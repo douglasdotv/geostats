@@ -33,3 +33,14 @@ export async function getCountryStats(): Promise<CountryStats[]> {
     averageDistance: Number(stat.average_distance),
   }));
 }
+
+export async function getGuessById(id: string) {
+  const { data, error } = await supabase
+    .from('guesses')
+    .select('*')
+    .eq('id', id)
+    .single();
+
+  if (error) throw error;
+  return data;
+}
