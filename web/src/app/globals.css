@@ -11,14 +11,12 @@
   --gradient-end: #ffffff;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-    --gradient-start: #001f3f;
-    --gradient-middle: #000000;
-    --gradient-end: #001f3f;
-  }
+.dark {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+  --gradient-start: #001f3f;
+  --gradient-middle: #000000;
+  --gradient-end: #001f3f;
 }
 
 body {
@@ -36,6 +34,7 @@ body {
   background-blend-mode: overlay;
   min-height: 100vh;
   backdrop-filter: blur(5px);
+  transition: color 0.7s ease;
 }
 
 ::-webkit-scrollbar {

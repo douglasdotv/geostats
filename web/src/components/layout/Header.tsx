@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Audiowide } from 'next/font/google';
+import { ThemeToggle } from '@/components/shared/ThemeToggle';
 import { AboutModal } from '@/components/about/AboutModal';
 import { CountryStatsButton } from '@/components/stats/CountryStatsButton';
 import { getCountryStats } from '@/app/actions';
@@ -33,6 +34,7 @@ export function Header() {
               <span className={`text-xl font-bold ${audiowide.className}`}>
                 GeoStats
               </span>
+              <ThemeToggle />
             </div>
             <div className='flex items-center gap-4'>
               <CountryStatsButton stats={countryStats} />
