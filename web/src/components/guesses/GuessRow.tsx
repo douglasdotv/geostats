@@ -2,13 +2,20 @@ import { Guess } from '@/types/guess';
 import { DistanceCell } from '@/components/guesses/DistanceCell';
 import { ClickableCountryFlag } from '@/components/shared/ClickableCountryFlag';
 import {
+  getCountryCode,
   getTimeToGuess,
   formatMovementRestrictions,
   formatRelativeTime,
 } from '@/lib/utils';
 import { GOOGLE_STREET_VIEW_BASE_URL } from '@/lib/constants';
-import lookup from 'country-code-lookup';
-import { FiPlus, FiMinus, FiMap, FiGlobe } from 'react-icons/fi';
+import {
+  FiPlus,
+  FiMinus,
+  FiMap,
+  FiGlobe,
+  FiExternalLink,
+} from 'react-icons/fi';
+import Link from 'next/link';
 
 interface GuessRowProps {
   readonly guess: Guess;
@@ -31,16 +38,6 @@ export function GuessRow({
   isLoading = false,
   onShowMap,
 }: GuessRowProps) {
-  function getCountryCode(countryName: string | null) {
-    if (!countryName) return null;
-    try {
-      const country = lookup.byCountry(countryName);
-      return country?.iso2 ?? null;
-    } catch {
-      return null;
-    }
-  }
-
   function renderLocation(
     displayName: string | null,
     countryName: string | null,
@@ -149,6 +146,14 @@ export function GuessRow({
               <FiGlobe />
             </a>
           )}
+          <Link
+            href={`/guess/${guess.id}`}
+            className='text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 transition-colors'
+            data-tooltip-id='guess-row-tooltip'
+            data-tooltip-content='Show details'
+          >
+            <FiExternalLink />
+          </Link>
         </div>
       </td>
     </tr>

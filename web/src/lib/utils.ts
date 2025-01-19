@@ -1,4 +1,15 @@
 import { GuessQuality } from '@/types/guess';
+import lookup from 'country-code-lookup';
+
+export function getCountryCode(countryName: string | null) {
+  if (!countryName) return null;
+  try {
+    const country = lookup.byCountry(countryName);
+    return country?.iso2 ?? null;
+  } catch {
+    return null;
+  }
+}
 
 export function getGuessQuality(distance: number | null): GuessQuality {
   const distanceKm = distance === null ? null : distance / 1000;
