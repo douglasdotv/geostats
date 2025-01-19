@@ -23,6 +23,7 @@ export function GuessesTable({
   >({});
   const [loadingRows, setLoadingRows] = useState<Set<string>>(new Set());
   const [activeMapGuess, setActiveMapGuess] = useState<Guess | null>(null);
+  const [errorRows, setErrorRows] = useState<Record<string, string>>({});
 
   async function toggleExpand(id: string, gameId: string, roundNumber: number) {
     const copy = new Set(expandedRows);
@@ -35,8 +36,23 @@ export function GuessesTable({
         if (data) {
           setAdditionalGuesses((prev) => ({ ...prev, [id]: data }));
         }
-      } catch (error) {
-        console.error('Failed to fetch additional guesses:', error);
+        setErrorRows((prev) => {
+          const next = { ...prev };
+          delete next[id];
+          return next;
+        });
+      } catch (err) {
+        if (err instanceof Error) {
+          setErrorRows((prev) => ({
+            ...prev,
+            [id]: err.message || 'Failed to fetch additional guesses.',
+          }));
+        } else {
+          setErrorRows((prev) => ({
+            ...prev,
+            [id]: 'Failed to fetch additional guesses.',
+          }));
+        }
       }
       setLoadingRows((prev) => {
         const next = new Set(prev);
@@ -65,7 +81,7 @@ export function GuessesTable({
                     scope='col'
                     className='whitespace-nowrap px-4 py-3 font-medium text-gray-900 dark:text-gray-100 text-center'
                   >
-                    Game Type
+                    Type
                   </th>
                   <th
                     scope='col'
@@ -110,6 +126,7 @@ export function GuessesTable({
                   const rowKey = `${guess.game_id}-${guess.round_number}`;
                   const isExpanded = expandedRows.has(rowKey);
                   const isLoading = loadingRows.has(rowKey);
+                  const error = errorRows[rowKey];
                   const otherGuesses = additionalGuesses[rowKey] ?? [];
 
                   return (
@@ -129,6 +146,16 @@ export function GuessesTable({
                         isLoading={isLoading}
                         onShowMap={() => setActiveMapGuess(guess)}
                       />
+                      {error && (
+                        <tr>
+                          <td
+                            colSpan={7}
+                            className='text-red-500 text-center px-4 py-2'
+                          >
+                            {error}
+                          </td>
+                        </tr>
+                      )}
                       {isExpanded &&
                         otherGuesses.map((g) => (
                           <GuessRow
