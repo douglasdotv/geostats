@@ -1,12 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useTransition } from 'react';
+import { useRouter } from 'next/navigation';
 import { Audiowide } from 'next/font/google';
 import { ThemeToggle } from '@/components/shared/ThemeToggle';
 import { AboutModal } from '@/components/about/AboutModal';
 import { CountryStatsButton } from '@/components/stats/CountryStatsButton';
 import { getCountryStats } from '@/app/actions';
 import { CountryStats } from '@/types/stats';
+import { Spinner } from '@/components/shared/Spinner';
 
 const audiowide = Audiowide({
   weight: '400',
@@ -16,14 +18,26 @@ const audiowide = Audiowide({
 export function Header() {
   const [showAbout, setShowAbout] = useState(false);
   const [countryStats, setCountryStats] = useState<CountryStats[]>([]);
+  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
   useEffect(() => {
     const fetchCountryStats = async () => {
-      const stats = await getCountryStats();
-      setCountryStats(stats);
+      try {
+        const stats = await getCountryStats();
+        setCountryStats(stats);
+      } catch (error) {
+        console.error('Failed to fetch country stats:', error);
+      }
     };
     fetchCountryStats();
   }, []);
+
+  const handleHomeClick = () => {
+    startTransition(() => {
+      router.push('/');
+    });
+  };
 
   return (
     <>
@@ -31,9 +45,14 @@ export function Header() {
         <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
           <div className='flex justify-between items-center h-16'>
             <div className='flex items-center'>
-              <span className={`text-xl font-bold ${audiowide.className}`}>
+              <button
+                onClick={handleHomeClick}
+                className={`text-xl font-bold ${audiowide.className} cursor-pointer flex items-center gap-2`}
+                aria-label='Navigate to home page'
+              >
                 GeoStats
-              </span>
+                {isPending && <Spinner />}
+              </button>
               <ThemeToggle />
             </div>
             <div className='flex items-center gap-4'>
