@@ -6,6 +6,7 @@ import {
   formatMovementRestrictions,
   formatRelativeTime,
 } from '@/lib/utils';
+import { GOOGLE_STREET_VIEW_BASE_URL } from '@/lib/constants';
 import lookup from 'country-code-lookup';
 import { FiPlus, FiMinus, FiMap, FiGlobe } from 'react-icons/fi';
 
@@ -138,7 +139,7 @@ export function GuessRow({
           )}
           {hasActualLocation && (
             <a
-              href={`https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${guess.actual_lat},${guess.actual_lng}`}
+              href={`${GOOGLE_STREET_VIEW_BASE_URL}${guess.actual_lat},${guess.actual_lng}`}
               target='_blank'
               rel='noopener noreferrer'
               className='text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 transition-colors'
