@@ -65,6 +65,8 @@ export function TableControls({
           </svg>
         </button>
 
+        {!isOptionsOpen && <ResetFiltersButton />}
+
         <div className='ml-auto'>
           <RefreshTableButton />
         </div>
@@ -104,6 +106,7 @@ export function TableControls({
                 />
               </svg>
             </button>
+
             <ResetFiltersButton />
           </div>
         </div>
