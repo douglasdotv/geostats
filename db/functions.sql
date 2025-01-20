@@ -229,3 +229,40 @@ RETURNS TABLE (
   FROM country_metrics
   ORDER BY correct_percentage DESC;
 $$ LANGUAGE SQL;
+
+-- Retrieve actual locations within specified geographic bounds
+CREATE OR REPLACE FUNCTION get_locations_in_bounds(
+    min_lat DOUBLE PRECISION,
+    min_lng DOUBLE PRECISION,
+    max_lat DOUBLE PRECISION,
+    max_lng DOUBLE PRECISION,
+    from_date TIMESTAMPTZ DEFAULT NULL
+)
+RETURNS TABLE (
+    id UUID,
+    lat DOUBLE PRECISION,
+    lng DOUBLE PRECISION,
+    location TEXT,
+    game_type TEXT,
+    created_at TIMESTAMPTZ
+) AS $$
+    SELECT DISTINCT ON (g.game_id, g.round_number)
+        g.id,
+        g.actual_lat as lat,
+        g.actual_lng as lng,
+        g.actual_display_name as location,
+        g.game_type,
+        g.created_at
+    FROM guesses g
+    WHERE (g.actual_lat BETWEEN min_lat AND max_lat AND g.actual_lng BETWEEN min_lng AND max_lng)
+    AND (from_date IS NULL OR g.created_at >= from_date)
+    AND (g.game_type IN ('duels', 'challenge') 
+        OR (g.game_type = 'br' AND g.distance = (
+            SELECT MIN(g2.distance)
+            FROM guesses g2
+            WHERE g2.game_id = g.game_id
+            AND g2.round_number = g.round_number
+        ))
+    )
+    ORDER BY g.game_id, g.round_number, g.created_at DESC;
+$$ LANGUAGE SQL;
