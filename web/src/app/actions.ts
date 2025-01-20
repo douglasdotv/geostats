@@ -2,6 +2,7 @@
 
 import { supabase } from '@/lib/supabaseClient';
 import { CountryStats } from '@/types/stats';
+import { GuessLocation } from '@/types/guess';
 import { isRawCountryStats } from '@/lib/validation';
 
 export async function getAdditionalGuesses(
@@ -43,4 +44,23 @@ export async function getGuessById(id: string) {
 
   if (error) throw error;
   return data;
+}
+
+export async function getLocationsInBounds(
+  minLat: number,
+  minLng: number,
+  maxLat: number,
+  maxLng: number,
+  fromDate?: string,
+): Promise<GuessLocation[]> {
+  const { data, error } = await supabase.rpc('get_locations_in_bounds', {
+    min_lat: minLat,
+    min_lng: minLng,
+    max_lat: maxLat,
+    max_lng: maxLng,
+    from_date: fromDate,
+  });
+
+  if (error) throw error;
+  return data ?? [];
 }
