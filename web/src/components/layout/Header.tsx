@@ -3,6 +3,7 @@
 import { useState, useEffect, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { Audiowide } from 'next/font/google';
+import { FiMenu, FiX } from 'react-icons/fi';
 import { ThemeToggle } from '@/components/shared/ThemeToggle';
 import { AboutModal } from '@/components/about/AboutModal';
 import { CountryStatsButton } from '@/components/stats/CountryStatsButton';
@@ -16,10 +17,36 @@ const audiowide = Audiowide({
 });
 
 export function Header() {
-  const [showAbout, setShowAbout] = useState(false);
   const [countryStats, setCountryStats] = useState<CountryStats[]>([]);
-  const [isPending, startTransition] = useTransition();
+  const [showAbout, setShowAbout] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isPendingGeoStats, startTransitionGeoStats] = useTransition();
+  const [isPendingVisitedPlaces, startTransitionVisitedPlaces] =
+    useTransition();
   const router = useRouter();
+
+  const handleMapClick = () => {
+    startTransitionVisitedPlaces(() => {
+      router.push('/places');
+      setIsMenuOpen(false);
+    });
+  };
+
+  const handleHomeClick = () => {
+    startTransitionGeoStats(() => {
+      router.push('/');
+      setIsMenuOpen(false);
+    });
+  };
+
+  const handleAboutClick = () => {
+    setShowAbout(true);
+    setIsMenuOpen(false);
+  };
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
 
   useEffect(() => {
     const fetchCountryStats = async () => {
@@ -33,12 +60,6 @@ export function Header() {
     fetchCountryStats();
   }, []);
 
-  const handleHomeClick = () => {
-    startTransition(() => {
-      router.push('/');
-    });
-  };
-
   return (
     <>
       <header className='border-b border-gray-300 dark:border-gray-800'>
@@ -51,20 +72,74 @@ export function Header() {
                 aria-label='Navigate to home page'
               >
                 GeoStats
-                {isPending && <Spinner />}
+                {isPendingGeoStats && <Spinner />}
               </button>
               <ThemeToggle />
             </div>
-            <div className='flex items-center gap-4'>
+
+            <div className='hidden md:flex items-center gap-4'>
+              <div className='flex items-center gap-2'>
+                <button
+                  onClick={handleMapClick}
+                  className='px-4 py-2 rounded-md border border-gray-400 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors'
+                  disabled={isPendingVisitedPlaces}
+                >
+                  <span>Visited Places</span>
+                </button>
+                {isPendingVisitedPlaces && <Spinner />}
+              </div>
               <CountryStatsButton stats={countryStats} />
               <button
-                onClick={() => setShowAbout(true)}
+                onClick={handleAboutClick}
                 className='px-4 py-2 rounded-md border border-gray-400 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors'
               >
                 About
               </button>
             </div>
+
+            <button
+              onClick={toggleMenu}
+              className='md:hidden p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors'
+              aria-label='Toggle menu'
+            >
+              {isMenuOpen ? <FiX size={24} /> : <FiMenu size={24} />}
+            </button>
           </div>
+
+          {isMenuOpen && (
+            <div className='md:hidden py-4 space-y-2 animate-[fadeIn_0.2s_ease-out]'>
+              <div className='flex items-center gap-2'>
+                <button
+                  onClick={handleMapClick}
+                  className='w-full px-4 py-2 text-left rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors'
+                  disabled={isPendingVisitedPlaces}
+                >
+                  <span>Visited Places</span>
+                </button>
+                {isPendingVisitedPlaces && <Spinner />}
+              </div>
+              <button
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  const statsButton = document.querySelector(
+                    '[data-testid="country-stats-button"]',
+                  );
+                  if (statsButton instanceof HTMLButtonElement) {
+                    statsButton.click();
+                  }
+                }}
+                className='w-full px-4 py-2 text-left rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors'
+              >
+                Country Stats
+              </button>
+              <button
+                onClick={handleAboutClick}
+                className='w-full px-4 py-2 text-left rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors'
+              >
+                About
+              </button>
+            </div>
+          )}
         </div>
       </header>
 

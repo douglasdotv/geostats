@@ -40,6 +40,15 @@ export interface GroupedGuess {
   otherGuesses: Guess[];
 }
 
+export interface GuessLocation {
+  id: string;
+  lat: number;
+  lng: number;
+  location: string | null;
+  game_type: string;
+  created_at: string;
+}
+
 export enum GuessQuality {
   Good = 'good',
   Average = 'average',
