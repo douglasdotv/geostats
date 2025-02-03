@@ -85,11 +85,19 @@ export function VisitedPlacesMap({ onLoadingChange }: VisitedPlacesMapProps) {
           new maplibregl.Popup({ offset: 15 }).setHTML(
             `<div class="bg-gray-100 rounded-lg p-3 text-sm text-gray-800">
               <p class="font-medium text-blue-900 leading-tight">${location.location ?? 'Unknown location'}</p>
-              <a href="${GOOGLE_STREET_VIEW_BASE_URL}${location.lat},${location.lng}" 
-                 target="_blank" 
-                 class="block mt-2 text-center text-white bg-blue-900 hover:bg-blue-800 transition-colors duration-200 rounded-md px-3 py-1">
-                View in Street View
-              </a>
+              
+              <div class="flex flex-col gap-2 mt-2">
+                <a href="${GOOGLE_STREET_VIEW_BASE_URL}${location.lat},${location.lng}" 
+                   target="_blank" 
+                   class="text-center text-white bg-blue-900 hover:bg-blue-800 transition-colors duration-200 rounded-md px-3 py-1">
+                  View in Street View
+                </a>
+                
+                <a href="/guess/${location.id}" 
+                   class="text-center text-white bg-blue-900 hover:bg-blue-800 transition-colors duration-200 rounded-md px-3 py-1">
+                  Show Guess Details
+                </a>
+              </div>
             </div>`,
           ),
         )
