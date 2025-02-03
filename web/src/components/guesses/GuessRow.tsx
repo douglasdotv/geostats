@@ -65,7 +65,7 @@ export function GuessRow({
 
   function getToggleIcon() {
     if (isLoading) return '...';
-    return isExpanded ? <FiMinus size={16} /> : <FiPlus size={16} />;
+    return isExpanded ? <FiMinus size={12} /> : <FiPlus size={12} />;
   }
 
   const gameTypeContent = `${guess.game_type}/${formatMovementRestrictions(guess.movement_restrictions)}`;
@@ -93,7 +93,7 @@ export function GuessRow({
         {isExpandable && (
           <button
             onClick={onToggle}
-            className='absolute left-2 top-1/2 transform -translate-y-1/2 flex items-center justify-center w-6 h-6 text-xs bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors'
+            className='absolute left-1 top-1/2 transform -translate-y-1/2 flex items-center justify-center w-4 h-4 text-[10px] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors'
             disabled={isLoading}
             data-tooltip-id='guess-row-tooltip'
             data-tooltip-content={brTooltipContent}
